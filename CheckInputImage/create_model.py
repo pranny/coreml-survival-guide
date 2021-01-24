@@ -1,5 +1,8 @@
 import coremltools as ct
 import coremltools.proto.FeatureTypes_pb2 as ft
+from PIL import Image
+import os
+
 
 spec = ct.proto.Model_pb2.Model()
 spec.specificationVersion = 1
@@ -36,3 +39,15 @@ new_layer.activation.linear.alpha = 1.0
 print(spec.description)
 
 ct.utils.save_spec(spec, "Image2Image.mlmodel")
+
+full_path = os.path.dirname(os.path.realpath(__file__))
+print(full_path)
+
+filepath = os.path.join(full_path, "CheckInputImage/sunflower.jpg")
+print(filepath)
+
+img = Image.open(filepath).resize((256, 256))
+model = ct.models.MLModel("Image2Image.mlmodel")
+op = model.predict({'image' :img})
+print(list(op['generatedImage'].getdata()))
+
